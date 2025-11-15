@@ -59,7 +59,8 @@ export class MCPServer implements Connectable {
 
     connectToTransport(transport: Transport): McpServer {
         const server = this.initilizeServe();
-        server.connect(transport);
+        if (!server.isConnected())
+            server.connect(transport);
         return server;
     }
 

@@ -1,8 +1,9 @@
 import OpenAIAgent from "./mcp/agents/open-ai.agent.js";
 import { getConnectedClient } from "./mcp/clients/index-stdio.js";
 import express, { json, Request, Response } from 'express';
+import { getConnectedHttpClient } from "./mcp/clients/index-http.js";
+import Agent from "./mcp/agents/agent.interface.js";
 
-const client = await getConnectedClient();
 
 const app = express();
 const port = 3000;
@@ -13,10 +14,8 @@ const streamResponse = (res: Response, data: string) => {
     res.write(`data: ${JSON.stringify({ content: data })}\n\n`);
 }
 
-app.post("/chat", async (req: Request, res: Response) => {
-    const openAIAgent = new OpenAIAgent(client);
-
-    try {
+const handleRequest = async(req: Request, res: Response, agent: Agent) => {
+try {
         // Set headers for SSE
         res.writeHead(200, {
             "Content-Type": "text/event-stream",
@@ -32,7 +31,7 @@ app.post("/chat", async (req: Request, res: Response) => {
             res.end();
             return;
         }
-
+        
         // Process the chat request
         const processChat = async () => {
             try {
@@ -40,7 +39,7 @@ app.post("/chat", async (req: Request, res: Response) => {
                 streamResponse(res, "Processing your request...");
 
                 // Run the MCP client with the prompt
-                await openAIAgent.executePrompt(prompt, (data: string) => {
+                await agent.executePrompt(prompt, (data: string) => {
                     streamResponse(res, data);
                 })
 
@@ -61,6 +60,14 @@ app.post("/chat", async (req: Request, res: Response) => {
         console.error("Server error:", error);
         res.status(500).json({ error: "Internal server error" });
     }
+}
+
+app.post("/http-chat", async (req: Request, res: Response) => {
+    await handleRequest(req, res, new OpenAIAgent(await getConnectedHttpClient()))
+})
+
+app.post("/stdio-chat", async (req: Request, res: Response) => {
+    await handleRequest(req, res, new OpenAIAgent(await getConnectedClient()))
 });
 
 // Start the server
