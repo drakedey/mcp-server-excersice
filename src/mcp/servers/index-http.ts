@@ -14,10 +14,10 @@ const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 app.post('/mcp', async (req: Request, res: Response) => {
     try {
         const sessionId = req.headers['mcp-session-id'] as string | undefined;
-        console.log('SESSION ID: ', sessionId);
-        console.log(req.body);
         let transport: StreamableHTTPServerTransport;
-
+        console.log('\n\n')
+        console.log(`sessionId: ${sessionId} - headers: ${JSON.stringify(req.headers)} - isInitializeRequest: ${isInitializeRequest(req.body)}`)
+        console.log(req.body);
         if (sessionId && transports[sessionId]) {
             // Fetch existing transport
             transport = transports[sessionId];
