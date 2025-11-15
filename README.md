@@ -29,3 +29,19 @@ curl --location 'http://localhost:3000/stdio-chat' \
     "prompt": "Add 2 and 10"
 }'
 ```
+## Running HttpStream endpoint
+### 1. Start the Application
+Once your .env file is set up, you can start the application by running the following command:
+``` bash
+npm run initialize-http-server && npm run host
+```
+This will run a server in `http://localhost:3000` and `http://localhost:3001`.
+### 2. Interact with the API
+You can interact with the application's API using curl. Here's an example of how to send a prompt to the /stdio-chat endpoint:
+``` bash
+curl --location 'http://localhost:3000/http-chat' \
+--header 'Content-Type: application/json' \
+--data '{
+    "prompt": "Add 2 and 10"
+}'
+``
