@@ -2,8 +2,9 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import z from "zod";
+import Connectable from "../conetable.interface.js";
 
-export class MCPServer {
+export class MCPServer implements Connectable {
 
      initilizeServe(): McpServer {
 
@@ -56,7 +57,7 @@ export class MCPServer {
         return server;
     }
 
-    connectServerToTransport(transport: Transport): McpServer {
+    connectToTransport(transport: Transport): McpServer {
         const server = this.initilizeServe();
         server.connect(transport);
         return server;

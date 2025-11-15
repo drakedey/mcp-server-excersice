@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node ./build/index.js",
-    "client": "npm run build && node ./build/client.js"
+    "stdio-client": "npm run build && node ./build/stdio.example.js"
   },
   "keywords": [],
   "author": "",

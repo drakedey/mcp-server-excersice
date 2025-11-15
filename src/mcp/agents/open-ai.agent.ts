@@ -1,40 +1,20 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { Response } from "express";
+import { Client } from "@modelcontextprotocol/sdk/client";
 import OpenAI from "openai";
-import { z } from "zod"; // Import zod for schema validation
+import Agent from "./agent.interface.js";
 
-export class MCPClient {
-    private openai: OpenAI;
+export default class OpenAIAgent implements Agent {
     private client: Client;
-    constructor() {
+    private openai: OpenAI;
+    constructor(client: Client) {
+        this.client = client;
         process.loadEnvFile();
         this.openai = new OpenAI({
             baseURL: "https://models.inference.ai.azure.com",
             apiKey: process.env.GITHUB_TOKEN,
         });
-
-        this.client = new Client(
-            {
-                name: "example-client",
-                version: "1.0.0"
-            },
-            {
-                capabilities: {
-                    prompts: {},
-                    resources: {},
-                    tools: {},
-                    logging: {}
-                }
-            }
-        );
     }
 
-    async connectToTransport(transport: Transport) {
-        await this.client.connect(transport);
-    }
-
-    async run(prompt: string, res: Response) {
+    async executePrompt(prompt: string, handleResponse?: (data: any) => void): Promise<any | void> {
         const toolsFromServer = await this.client.listTools();
 
         const tools = toolsFromServer.tools.map((tool) => {
@@ -64,33 +44,11 @@ export class MCPClient {
             const { message } = choice;
             if (message.tool_calls) {
                 const result = await this.callTools(message.tool_calls, results);
-                console.log(res.writableEnded);
-                res.write(`data: ${result}\n\n`);
+                handleResponse?.(result);
             }
         }
     }
 
-    private openAiToolAdapter(tool: {
-        name: string;
-        description?: string;
-        input_schema: any;
-    }) {
-        // Create a zod schema based on the input_schema
-        const schema = z.object(tool.input_schema);
-
-        return {
-            type: "function" as const, // Explicitly set type to "function"
-            function: {
-                name: tool.name,
-                description: tool.description,
-                parameters: {
-                    type: "object",
-                    properties: tool.input_schema.properties,
-                    required: tool.input_schema.required,
-                },
-            },
-        };
-    }
 
     async callTools(
         tool_calls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[],
@@ -113,6 +71,25 @@ export class MCPClient {
             return JSON.stringify(toolResult);
 
         }
+    }
+
+    private openAiToolAdapter(tool: {
+        name: string;
+        description?: string;
+        input_schema: any;
+    }) {
+        return {
+            type: "function" as const, // Explicitly set type to "function"
+            function: {
+                name: tool.name,
+                description: tool.description,
+                parameters: {
+                    type: "object",
+                    properties: tool.input_schema.properties,
+                    required: tool.input_schema.required,
+                },
+            },
+        };
     }
 
 }
