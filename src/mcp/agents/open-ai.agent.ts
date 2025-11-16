@@ -9,8 +9,8 @@ export default class OpenAIAgent implements Agent {
         this.client = client;
         process.loadEnvFile();
         this.openai = new OpenAI({
-            baseURL: "https://models.inference.ai.azure.com",
-            apiKey: process.env.GITHUB_TOKEN,
+            baseURL: process.env.MODEL_URL,
+            apiKey: process.env.MODEL_TOKEN,
         });
     }
 
@@ -30,10 +30,8 @@ export default class OpenAIAgent implements Agent {
             content: prompt
         }]
 
-        console.log('Querying LLM: ', messages[0].content);
-
         const response = await this.openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: process.env.MODEL_NAME || '',
             max_tokens: 1000,
             messages,
             tools

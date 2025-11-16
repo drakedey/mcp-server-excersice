@@ -8,11 +8,12 @@ This token will be used to authenticate your requests.
 ### 2. Create a .env File
 Create a file named .env in the root directory of your project. This file will store your environment variables.
 ### 3. Add Your GitHub Token to .env
-Inside the .env file, add your generated GitHub Personal Access Token in the following format:
+Inside the .env file, specify the parameters that are going to initiate the AI model e.g:
 ``` .env
-GITHUB_TOKEN=your_github_personal_access_token_here
+MODEL_TOKEN=NULL
+MODEL_URL=http://127.0.0.1:1234/v1
+MODEL_NAME=openai/gpt-oss-20b
 ```
-Replace your_github_personal_access_token_here with the actual token you generated in step 1.
 
 ### 4. Start the Application
 Once your .env file is set up, you can start the application by running the following command:

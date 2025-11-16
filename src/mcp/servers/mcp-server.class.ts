@@ -1,5 +1,4 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import z from "zod";
 import Connectable from "../conetable.interface.js";
@@ -24,7 +23,6 @@ export class MCPServer implements Connectable {
             }
         }, async ({ a, b }) => {
             const output = { result: a + b };
-            console.log("Adding:", a, b, "=", output.result);
             return {
                 content: [{ type: 'text', text: JSON.stringify(output) }],
                 structuredContent: output
